@@ -27,6 +27,7 @@ export {
 } from "./markdown/utils";
 
 export { createDescription } from "./markdown/createDescription";
+export { createRequestSchema } from "./markdown/createRequestSchema";
 
 export function isURL(str: string): boolean {
   return /^(https?:)\/\//m.test(str);
