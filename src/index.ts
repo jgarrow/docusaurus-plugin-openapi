@@ -19,6 +19,15 @@ import { OptionsSchema } from "./options";
 import generateSidebarSlice from "./sidebars";
 import type { PluginOptions, LoadedContent, APIOptions } from "./types";
 
+export {
+  create,
+  render as renderChildren,
+  greaterThan,
+  lessThan,
+} from "./markdown/utils";
+
+export { createDescription } from "./markdown/createDescription";
+
 export function isURL(str: string): boolean {
   return /^(https?:)\/\//m.test(str);
 }
