@@ -25,10 +25,9 @@ export {
   greaterThan,
   lessThan,
 } from "./markdown/utils";
-
 export { createDescription } from "./markdown/createDescription";
 export { createRequestSchema } from "./markdown/createRequestSchema";
-export { createExampleFromSchema } from "./markdown/createStatusCodes";
+export { sampleResponseFromSchema } from "./openapi/createResponseExample";
 
 export function isURL(str: string): boolean {
   return /^(https?:)\/\//m.test(str);
