@@ -27,7 +27,7 @@ export {
 } from "./markdown/utils";
 export { createDescription } from "./markdown/createDescription";
 export { createRequestSchema } from "./markdown/createRequestSchema";
-export { sampleResponseFromSchema } from "./openapi/createResponseExample";
+export { sampleResponseFromSchema } from "./openapi";
 
 export function isURL(str: string): boolean {
   return /^(https?:)\/\//m.test(str);
@@ -145,13 +145,23 @@ export default function pluginOpenAPIDocs(
 
       // TODO: figure out better way to set default
       if (Object.keys(sidebarOptions ?? {}).length > 0) {
-        const sidebarSlice = generateSidebarSlice(
-          sidebarOptions!,
+        // need to get any other .mdx files in options.outputDir
+        // that are NOT *.api.mdx, *.tag.mdx, or *.info.mdx
+        // and add them to the sidebar
+        const apiDir = path.join(siteDir, outputDir);
+        const nonApiMdxFiles = await Globby(["*.mdx"], {
+          cwd: path.resolve(apiDir),
+          deep: 1,
+        });
+
+        const sidebarSlice = generateSidebarSlice({
+          sidebarOptions: sidebarOptions!,
           options,
-          loadedApi,
+          api: loadedApi,
           tags,
-          docPath
-        );
+          nonApiMdxFiles,
+          docPath,
+        });
 
         const sidebarSliceTemplate = `module.exports = {{{slice}}};`;
 

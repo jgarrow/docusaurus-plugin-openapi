@@ -5,6 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  * ========================================================================== */
 
+import fs from "fs";
 import path from "path";
 
 import {
@@ -15,6 +16,7 @@ import {
 } from "@docusaurus/plugin-content-docs/src/sidebars/types";
 import { posixPath } from "@docusaurus/utils";
 import clsx from "clsx";
+import getFrontmatter from "gray-matter";
 import { kebabCase } from "lodash";
 import uniq from "lodash/uniq";
 
@@ -34,13 +36,33 @@ function isInfoItem(item: ApiMetadata): item is ApiMetadata {
   return item.type === "info";
 }
 
-function groupByTags(
-  items: ApiPageMetadata[],
-  sidebarOptions: SidebarOptions,
-  options: APIOptions,
-  tags: TagObject[][],
-  docPath: string
-): ProcessedSidebar {
+type NonApiItem = {
+  sidebar_position?: number;
+  sidebar_label?: string;
+  title?: string;
+  id: string;
+  tags?: string[];
+  description?: string;
+  slug?: string;
+};
+
+type GroupByTagsArgs = {
+  items: ApiPageMetadata[];
+  sidebarOptions: SidebarOptions;
+  options: APIOptions;
+  tags: TagObject[][];
+  docPath: string;
+  nonApiMdxFiles: string[] | [];
+};
+
+function groupByTags({
+  items,
+  sidebarOptions,
+  options,
+  tags,
+  nonApiMdxFiles,
+  docPath,
+}: GroupByTagsArgs): ProcessedSidebar {
   let { outputDir, label } = options;
 
   // Remove trailing slash before proceeding
@@ -64,6 +86,20 @@ function groupByTags(
     };
   });
 
+  const nonApiItems = nonApiMdxFiles
+    .map((item: string) => {
+      const itemFilePath = path.join(outputDir, item);
+      const itemFileContents = fs.readFileSync(itemFilePath, "utf8");
+      const { data: frontmatter } = getFrontmatter(itemFileContents);
+
+      if (frontmatter?.draft) {
+        return null;
+      }
+
+      return frontmatter;
+    })
+    .filter(Boolean) as NonApiItem[];
+
   // TODO: make sure we only take the first tag
   const operationTags = uniq(
     apiItems
@@ -85,10 +121,12 @@ function groupByTags(
   const basePath = docPath
     ? outputDir.split(docPath!)[1].replace(/^\/+/g, "")
     : outputDir.slice(outputDir.indexOf("/", 1)).replace(/^\/+/g, "");
+
   function createDocItem(item: ApiPageMetadata): SidebarItemDoc {
     const sidebar_label = item.frontMatter.sidebar_label;
     const title = item.title;
     const id = item.id;
+
     return {
       type: "doc" as const,
       id:
@@ -102,6 +140,17 @@ function groupByTags(
         },
         item.api.method
       ),
+    };
+  }
+
+  function createNonApiDocItem(item: NonApiItem): SidebarItemDoc {
+    const { sidebar_label, title, id } = item;
+
+    return {
+      type: "doc" as const,
+      id: basePath === "" || undefined ? `${id}` : `${basePath}/${id}`,
+      label: (sidebar_label as string) ?? title ?? id,
+      customProps,
     };
   }
 
@@ -121,6 +170,7 @@ function groupByTags(
       const taggedInfoObject = intros.find((i) =>
         i.tags ? i.tags.find((t: any) => t.name === tag) : undefined
       );
+
       const tagObject = tags.flat().find(
         (t) =>
           tag === t.name ?? {
@@ -169,23 +219,38 @@ function groupByTags(
         } as SidebarItemCategoryLinkConfig;
       }
 
+      const tagApiItems = apiItems
+        .filter((item) => !!item.api.tags?.includes(tag))
+        .map(createDocItem);
+
+      const tagNonApiItems = nonApiItems
+        .filter((i) =>
+          i.tags ? i.tags.find((t: any) => t.name === tag) : false
+        )
+        .map(createNonApiDocItem);
+
+      const items = [...tagNonApiItems, ...tagApiItems];
       return {
         type: "category" as const,
         label: tagObject?.["x-displayName"] ?? tag,
         link: linkConfig,
         collapsible: sidebarCollapsible,
         collapsed: sidebarCollapsed,
-        items: apiItems
-          .filter((item) => !!item.api.tags?.includes(tag))
-          .map(createDocItem),
+        items,
       };
     })
     .filter((item) => item.items.length > 0); // Filter out any categories with no items.
 
   // Handle items with no tag
-  const untaggedItems = apiItems
+  const untaggedApiItems = apiItems
     .filter(({ api }) => api.tags === undefined || api.tags.length === 0)
     .map(createDocItem);
+
+  const untaggedNonApiItems = nonApiItems
+    .filter((i) => i.tags === undefined || i.tags.length === 0)
+    .map(createNonApiDocItem);
+
+  const untaggedItems = [...untaggedNonApiItems, ...untaggedApiItems];
   let untagged: SidebarItemCategory[] = [];
   if (untaggedItems.length > 0) {
     untagged = [
@@ -194,9 +259,7 @@ function groupByTags(
         label: "UNTAGGED",
         collapsible: sidebarCollapsible!,
         collapsed: sidebarCollapsed!,
-        items: apiItems
-          .filter(({ api }) => api.tags === undefined || api.tags.length === 0)
-          .map(createDocItem),
+        items: untaggedItems,
       },
     ];
   }
@@ -210,23 +273,34 @@ function groupByTags(
   return [...tagged, ...untagged];
 }
 
-export default function generateSidebarSlice(
-  sidebarOptions: SidebarOptions,
-  options: APIOptions,
-  api: ApiMetadata[],
-  tags: TagObject[][],
-  docPath: string
-) {
+type GenerateSidebarSliceArgs = {
+  sidebarOptions: SidebarOptions;
+  options: APIOptions;
+  api: ApiMetadata[];
+  tags: TagObject[][];
+  nonApiMdxFiles: string[] | [];
+  docPath: string;
+};
+
+export default function generateSidebarSlice({
+  sidebarOptions,
+  options,
+  api,
+  tags,
+  nonApiMdxFiles,
+  docPath,
+}: GenerateSidebarSliceArgs) {
   let sidebarSlice: ProcessedSidebar = [];
 
   if (sidebarOptions.groupPathsBy === "tag") {
-    sidebarSlice = groupByTags(
-      api as ApiPageMetadata[],
+    sidebarSlice = groupByTags({
+      items: api as ApiPageMetadata[],
       sidebarOptions,
       options,
       tags,
-      docPath
-    );
+      nonApiMdxFiles,
+      docPath,
+    });
   }
   return sidebarSlice;
 }
