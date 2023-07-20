@@ -41,7 +41,7 @@ type NonApiItem = {
   sidebar_label?: string;
   title?: string;
   id: string;
-  tags?: string[];
+  api_tags?: string[];
   description?: string;
   slug?: string;
 };
@@ -225,14 +225,18 @@ function groupByTags({
 
       const tagNonApiItems = nonApiItems
         .filter((i) =>
-          i.tags ? i.tags.find((t: any) => t.name === tag) : false
+          i.api_tags ? i.api_tags.find((t: string) => t === tag) : false
         )
         .map(createNonApiDocItem);
 
       const items = [...tagNonApiItems, ...tagApiItems];
+
+      const tagObjectLabel = tagObject?.["x-displayName"] ?? tag;
+      const uppercaseLabel =
+        tagObjectLabel.charAt(0).toUpperCase() + tagObjectLabel.slice(1);
       return {
         type: "category" as const,
-        label: tagObject?.["x-displayName"] ?? tag,
+        label: uppercaseLabel,
         link: linkConfig,
         collapsible: sidebarCollapsible,
         collapsed: sidebarCollapsed,
@@ -247,7 +251,7 @@ function groupByTags({
     .map(createDocItem);
 
   const untaggedNonApiItems = nonApiItems
-    .filter((i) => i.tags === undefined || i.tags.length === 0)
+    .filter((i) => i.api_tags === undefined || i.api_tags.length === 0)
     .map(createNonApiDocItem);
 
   const untaggedItems = [...untaggedNonApiItems, ...untaggedApiItems];
