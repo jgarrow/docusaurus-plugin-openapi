@@ -971,7 +971,6 @@ function createNodes(schema: SchemaObject): any {
   }
 
   if (nodes.length && nodes.length > 0) {
-    console.log("nodes before: ", nodes);
     return nodes.filter(Boolean).flat();
   }
 
