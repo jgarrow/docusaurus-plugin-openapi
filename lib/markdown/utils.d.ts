@@ -1,5 +1,5 @@
-export declare type Children = string | undefined | (string | string[] | undefined)[];
-export declare type Props = Record<string, any> & {
+export type Children = string | undefined | (string | string[] | undefined)[];
+export type Props = Record<string, any> & {
     children?: Children;
 };
 export declare function create(tag: string, props: Props): string;

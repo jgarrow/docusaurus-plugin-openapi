@@ -48,7 +48,7 @@ export interface APIVersionOptions {
 export interface LoadedContent {
     loadedApi: ApiMetadata[];
 }
-export declare type ApiMetadata = ApiPageMetadata | InfoPageMetadata | TagPageMetadata;
+export type ApiMetadata = ApiPageMetadata | InfoPageMetadata | TagPageMetadata;
 export interface ApiMetadataBase {
     sidebar?: string;
     previous?: ApiNavLink;
@@ -98,7 +98,7 @@ export interface TagPageMetadata extends ApiMetadataBase {
     tag: TagObject;
     markdown?: string;
 }
-export declare type ApiInfo = InfoObject;
+export type ApiInfo = InfoObject;
 export interface ApiNavLink {
     title: string;
     permalink: string;

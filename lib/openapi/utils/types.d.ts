@@ -1,4 +1,4 @@
-declare type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
+type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 export interface OpenAPISpec {
     openapi: string;
     info: OpenAPIInfo;
@@ -38,7 +38,7 @@ export interface OpenAPIPaths {
 export interface OpenAPIRef {
     $ref: string;
 }
-export declare type Referenced<T> = OpenAPIRef | T;
+export type Referenced<T> = OpenAPIRef | T;
 export interface OpenAPIPath {
     summary?: string;
     description?: string;
@@ -182,8 +182,8 @@ export interface OpenAPIEncoding {
     explode: boolean;
     allowReserved: boolean;
 }
-export declare type OpenAPIParameterLocation = "query" | "header" | "path" | "cookie";
-export declare type OpenAPIParameterStyle = "matrix" | "label" | "form" | "simple" | "spaceDelimited" | "pipeDelimited" | "deepObject";
+export type OpenAPIParameterLocation = "query" | "header" | "path" | "cookie";
+export type OpenAPIParameterStyle = "matrix" | "label" | "form" | "simple" | "spaceDelimited" | "pipeDelimited" | "deepObject";
 export interface OpenAPIRequestBody {
     description?: string;
     required?: boolean;
@@ -216,7 +216,7 @@ export interface OpenAPIResponse extends Pick<OpenAPIRequestBody, "description" 
 export interface OpenAPILink {
     $ref?: string;
 }
-export declare type OpenAPIHeader = Omit<OpenAPIParameter, "in" | "name">;
+export type OpenAPIHeader = Omit<OpenAPIParameter, "in" | "name">;
 export interface OpenAPICallback {
     [name: string]: OpenAPIPath;
 }

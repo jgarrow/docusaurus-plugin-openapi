@@ -1,5 +1,5 @@
 import { OpenAPIRef, OpenAPISchema, OpenAPISpec, Referenced } from "../types";
-export declare type MergedOpenAPISchema = OpenAPISchema & {
+export type MergedOpenAPISchema = OpenAPISchema & {
     parentRefs?: string[];
 };
 /**

@@ -81,8 +81,8 @@ export interface ComponentsObjectWithRef {
     links?: Map<LinkObject | ReferenceObject>;
     callbacks?: Map<CallbackObjectWithRef | ReferenceObject>;
 }
-export declare type PathsObject = Map<PathItemObject>;
-export declare type PathsObjectWithRef = Map<PathItemObjectWithRef>;
+export type PathsObject = Map<PathItemObject>;
+export type PathsObjectWithRef = Map<PathItemObjectWithRef>;
 export interface PathItemObject {
     $ref?: string;
     summary?: string;
@@ -214,8 +214,8 @@ export interface EncodingObjectWithRef {
     explode?: boolean;
     allowReserved?: boolean;
 }
-export declare type ResponsesObject = Map<ResponseObject>;
-export declare type ResponsesObjectWithRef = Map<ResponseObjectWithRef | ReferenceObject>;
+export type ResponsesObject = Map<ResponseObject>;
+export type ResponsesObjectWithRef = Map<ResponseObjectWithRef | ReferenceObject>;
 export interface ResponseObject {
     description: string;
     headers?: Map<HeaderObject>;
@@ -228,8 +228,8 @@ export interface ResponseObjectWithRef {
     content?: Map<MediaTypeObjectWithRef>;
     links?: Map<LinkObject | ReferenceObject>;
 }
-export declare type CallbackObject = Map<PathItemObject>;
-export declare type CallbackObjectWithRef = Map<PathItemObjectWithRef>;
+export type CallbackObject = Map<PathItemObject>;
+export type CallbackObjectWithRef = Map<PathItemObjectWithRef>;
 export interface ExampleObject {
     summary?: string;
     description?: string;
@@ -244,8 +244,8 @@ export interface LinkObject {
     description?: string;
     server?: ServerObject;
 }
-export declare type HeaderObject = Omit<ParameterObject, "name" | "in">;
-export declare type HeaderObjectWithRef = Omit<ParameterObjectWithRef, "name" | "in">;
+export type HeaderObject = Omit<ParameterObject, "name" | "in">;
+export type HeaderObjectWithRef = Omit<ParameterObjectWithRef, "name" | "in">;
 export interface TagObject {
     name?: string;
     description?: string;
@@ -255,8 +255,8 @@ export interface TagObject {
 export interface ReferenceObject {
     $ref: string;
 }
-export declare type JSONSchema = JSONSchema4 | JSONSchema6 | JSONSchema7;
-export declare type SchemaObject = Omit<JSONSchema, "type" | "allOf" | "oneOf" | "anyOf" | "not" | "items" | "properties" | "additionalProperties"> & {
+export type JSONSchema = JSONSchema4 | JSONSchema6 | JSONSchema7;
+export type SchemaObject = Omit<JSONSchema, "type" | "allOf" | "oneOf" | "anyOf" | "not" | "items" | "properties" | "additionalProperties"> & {
     type?: "string" | "number" | "integer" | "boolean" | "object" | "array";
     allOf?: SchemaObject[];
     oneOf?: SchemaObject[];
@@ -274,7 +274,7 @@ export declare type SchemaObject = Omit<JSONSchema, "type" | "allOf" | "oneOf" |
     example?: any;
     deprecated?: boolean;
 };
-export declare type SchemaObjectWithRef = Omit<JSONSchema, "type" | "allOf" | "oneOf" | "anyOf" | "not" | "items" | "properties" | "additionalProperties"> & {
+export type SchemaObjectWithRef = Omit<JSONSchema, "type" | "allOf" | "oneOf" | "anyOf" | "not" | "items" | "properties" | "additionalProperties"> & {
     type?: "string" | "number" | "integer" | "boolean" | "object" | "array";
     allOf?: (SchemaObject | ReferenceObject)[];
     oneOf?: (SchemaObject | ReferenceObject)[];
@@ -303,7 +303,7 @@ export interface XMLObject {
     attribute?: boolean;
     wrapped?: boolean;
 }
-export declare type SecuritySchemeObject = ApiKeySecuritySchemeObject | HttpSecuritySchemeObject | Oauth2SecuritySchemeObject | OpenIdConnectSecuritySchemeObject;
+export type SecuritySchemeObject = ApiKeySecuritySchemeObject | HttpSecuritySchemeObject | Oauth2SecuritySchemeObject | OpenIdConnectSecuritySchemeObject;
 export interface ApiKeySecuritySchemeObject {
     type: "apiKey";
     description?: string;
@@ -340,5 +340,5 @@ export interface OAuthFlowObject {
     refreshUrl?: string;
     scopes: Map<string>;
 }
-export declare type SecurityRequirementObject = Map<string[]>;
+export type SecurityRequirementObject = Map<string[]>;
 export {};
